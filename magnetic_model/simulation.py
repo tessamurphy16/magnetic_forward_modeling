@@ -80,3 +80,26 @@ def simulate(
         background, background + anomaly, anomaly, bx_faces, bz_faces,
         profile_vector, profile_total, diagnostics,
     )
+
+
+def simulate_at_location(
+    body: OreBody,
+    *,
+    latitude_deg: float,
+    longitude_deg: float,
+    azimuth_deg: float,
+    observation_height_m: float = 0.0,
+    grid: Grid = Grid(),
+) -> SimulationResult:
+    """Use the local IGRF-14 main field as the uniform inducing field."""
+    from .igrf import geographic_field
+
+    field = geographic_field(latitude_deg, longitude_deg)
+    # In a purely vertical field the azimuth of the zero horizontal
+    # component has no effect on the existing survey rotation.
+    declination = field.declination_deg if field.horizontal_nt else 0.0
+    return simulate(
+        body, intensity_nt=field.total_nt, inclination_deg=field.inclination_deg,
+        declination_deg=declination, azimuth_deg=azimuth_deg,
+        observation_height_m=observation_height_m, grid=grid,
+    )

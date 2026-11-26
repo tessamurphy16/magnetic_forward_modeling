@@ -2,7 +2,7 @@
 
 A numerical PDE course project for exploring how buried magnetic bodies affect surface survey measurements. The planned browser app will use an interactive globe and IGRF to set the inducing field, then compute a 2D anomaly heatmap and a surface total-field anomaly profile in nT.
 
-The standalone NumPy/SciPy solver accepts local IGRF field elements supplied by the caller. Geographic IGRF evaluation, the browser interface and the Pages workflow are future milestones.
+The standalone NumPy/SciPy solver accepts either caller-supplied field elements or a geographic location evaluated offline with IGRF-14. The browser interface and Pages workflow are future milestones.
 
 ## Run the solver and tests
 
@@ -37,6 +37,19 @@ profile_nt = result.profile_total_anomaly_nt
 The example field elements are illustrative. Enter intensity in nT and angles in degrees, with inclination positive down and declination and survey azimuth clockwise from true north. The grid uses square cells and depth increases downward. Height is measured upward from the surface. Zero height samples the air side at ground level. The exact profile uses the full three-component inducing field.
 
 Potential is in A. Scalar arrays are indexed by depth then distance, and magnetic induction vectors end in survey, strike, and down components. The result also provides cell and face coordinates in m, face-normal anomalies in nT, represented ore-body bounds, and linear and flux-balance residuals. Ore-body geometry is assigned by cell centers, so the represented bounds can differ from the requested dimensions.
+
+## Evaluate the geographic main field
+
+```python
+from magnetic_model.igrf import geographic_field
+
+field = geographic_field(latitude_deg=39.7, longitude_deg=-105.0)
+print(field)
+```
+
+To run a model from coordinates, call `simulate_at_location` with the ore body, latitude, longitude, survey azimuth, and the usual optional grid and observation height. IGRF-14 is fixed at decimal year 2026.0 and WGS84 ellipsoid height 0 km. See the [IGRF-14 notes](docs/igrf-14.md) for coefficient licensing, conventions, independent reference comparisons, and Pyodide results.
+
+Open the executed [geomagnetic demonstration](notebooks/geomagnetic_field_demo.ipynb) for location and azimuth comparisons. To rerun it in the same environment as the verification notebook, use `python -m notebook notebooks/geomagnetic_field_demo.ipynb`.
 
 ## Run the verification notebook
 

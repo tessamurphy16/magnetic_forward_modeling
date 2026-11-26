@@ -5,3 +5,5 @@ OpenAI Codex drafted the repository structure and implementation plan from the p
 OpenAI Codex also assisted with the Python solver, field and profile reconstruction, and native tests. Verification includes orientation and unit checks, residual and interface-flux checks, a cylinder benchmark, and separate rectangular-body grid and domain comparisons.
 
 OpenAI Codex assisted with the verification notebook, analytical boundary support, and the affine boundary regression test. The notebook was executed against the shared solver. It records numerical residuals, analytic comparisons, refinement, and domain-sensitivity results.
+
+OpenAI Codex assisted with the IGRF-14 wrapper, geographic solver integration, tests, reference comparisons, and Jupyter demonstration. Geographic fields were checked against independently computed NOAA/CIRES geomaglib results and run with the shared solver in a Chromium Pyodide worker.
