@@ -39,7 +39,8 @@ Use the same definition of `ΔB = B - B0` throughout the model. The strike contr
 
 | Planned file | Responsibility |
 | --- | --- |
-| `magnetic_model/geomagnetic.py` | IGRF evaluation, input validation, coordinate rotation, and field metadata |
+| `magnetic_model/geomagnetic.py` | Survey-coordinate rotation |
+| `magnetic_model/igrf.py` | Offline IGRF-14 geographic evaluation at 2026.0 and 0 km |
 | `magnetic_model/geometry.py` | Grid, ore-body placement, domain padding, and cell permeability |
 | `magnetic_model/solver.py` | Conservative face fluxes, sparse system assembly, boundary treatment, and potential solve |
 | `magnetic_model/observables.py` | Field reconstruction, surface sampling, and nT conversion |
