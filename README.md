@@ -1,8 +1,28 @@
 # 2D magnetic forward modeling
 
-A numerical PDE course project for exploring how buried magnetic bodies affect surface survey measurements. The planned browser app will use an interactive globe and IGRF to set the inducing field, then compute a 2D anomaly heatmap and a surface total-field anomaly profile in nT.
+A numerical PDE course project for exploring how buried magnetic bodies affect surface survey measurements. The browser app uses an interactive globe and IGRF to set the inducing field, then computes a 2D anomaly heatmap and a survey total-field anomaly profile in nT.
 
-The standalone NumPy/SciPy solver accepts either caller-supplied field elements or a geographic location evaluated offline with IGRF-14. The browser interface and Pages workflow are future milestones.
+The standalone NumPy/SciPy solver accepts either caller-supplied field elements or a geographic location evaluated offline with IGRF-14. The dashboard runs the same Python package in a Pyodide Web Worker.
+
+## Preview the web dashboard
+
+Visitors need a modern browser with JavaScript and WebAssembly. WebGL powers the globe, and coordinate inputs remain available on devices without WebGL. Maintainers can stage a self-contained copy with Python 3.12 from the repository root:
+
+```sh
+python3 web/build_site.py /tmp/magnetic-site/magnetic_forward_modeling
+python3 -m http.server 8893 --bind 127.0.0.1 --directory /tmp/magnetic-site
+```
+
+Open `http://127.0.0.1:8893/magnetic_forward_modeling/` and use **Run simulation**. The build downloads and verifies pinned assets. Once staged, the site uses paths relative to the repository URL and serves the globe, runtime, and model files locally. The application needs no backend or external calculation service. See the [browser validation notes](docs/browser-validation.md) for timing results, dependency versions, and how to rerun the Chromium test.
+
+## Publish with GitHub Pages
+
+1. In the repository, open **Settings → Pages**. Under **Build and deployment**, set **Source** to **GitHub Actions**. If organization or repository policy has disabled Pages or Actions, a repository administrator must enable access first.
+2. Merge the deployment workflow into `main`. The push to `main` automatically starts the workflow. To deploy manually after it is on `main`, open **Actions → Deploy magnetic modeling dashboard → Run workflow**, select `main`, and click **Run workflow**.
+3. Wait for **Test and build static site** and **Publish to GitHub Pages** to succeed. If the `github-pages` environment requires a reviewer, approve the deployment in that workflow run.
+4. Open the published site. [Magnetic Forward Modeling](https://tessamurphy16.github.io/magnetic_forward_modeling/)
+
+Pull requests targeting `main` run the tests and build. Publishing is limited to `main`. If the deploy job fails, check **Settings → Pages** for the source and open the Actions run for the job error.
 
 ## Run the solver and tests
 
@@ -76,10 +96,10 @@ The largest sensitivity case solves for 262,144 cells. For the rectangular examp
 | --- | --- |
 | `magnetic_model/` | Shared Python package for geomagnetism, model geometry, the PDE, and survey observables |
 | `web/` | Static HTML, CSS, JavaScript, and a dedicated Pyodide worker |
-| `web/vendor/` | Staging location for browser runtime assets assembled by the Pages build |
+| `web/vendor/` | Reserved for browser assets in the staged site |
 | `notebooks/` | Executed numerical verification notebook importing the shared Python package |
 | `tests/` | Native Python tests and browser smoke checks |
-| `.github/workflows/` | Future validation and GitHub Pages deployment workflows |
+| `.github/workflows/` | Numerical validation and GitHub Pages deployment |
 | [docs/implementation-plan.md](docs/implementation-plan.md) | Physics, numerical verification, interface, and delivery milestones |
 | [AGENTS.md](AGENTS.md) | Repository conventions for contributors and coding agents |
 | [AI_USE.md](AI_USE.md) | AI-use statement |

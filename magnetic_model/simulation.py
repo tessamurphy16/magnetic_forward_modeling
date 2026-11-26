@@ -1,6 +1,7 @@
 """Standalone user-facing magnetic forward model."""
 
 from dataclasses import dataclass
+from time import perf_counter
 
 import numpy as np
 
@@ -17,6 +18,7 @@ class SolverDiagnostics:
     max_flux_divergence_nt_per_m: float
     body_bounds_m: tuple[float, float, float, float]
     spacing_m: float
+    pde_seconds: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -57,9 +59,12 @@ def simulate(
     x, z = cell_centers(x_faces), cell_centers(z_faces)
     permeability, bounds = rectangular_model(grid, body)
     background_t = survey_field_t(intensity_nt, inclination_deg, declination_deg, azimuth_deg)
+    pde_start = perf_counter()
     potential, flux_x, flux_z, residual, relative = solve_potential(
         permeability, grid.spacing_m, background_t[[0, 2]] / MU_0,
     )
+
+    pde_seconds = perf_counter() - pde_start
 
     background = background_t / NT_TO_T
     bx_faces = flux_x * (MU_0 / NT_TO_T)
@@ -73,7 +78,7 @@ def simulate(
     )
     divergence = (np.diff(bx_faces, axis=1) + np.diff(bz_faces, axis=0)) / grid.spacing_m
     diagnostics = SolverDiagnostics(
-        residual, relative, float(np.max(np.abs(divergence))), bounds, grid.spacing_m,
+        residual, relative, float(np.max(np.abs(divergence))), bounds, grid.spacing_m, pde_seconds,
     )
     return SimulationResult(
         x, z, x_faces, z_faces, observation_height_m, permeability, potential,

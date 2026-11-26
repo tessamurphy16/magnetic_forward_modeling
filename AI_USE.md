@@ -7,3 +7,7 @@ OpenAI Codex also assisted with the Python solver, field and profile reconstruct
 OpenAI Codex assisted with the verification notebook, analytical boundary support, and the affine boundary regression test. The notebook was executed against the shared solver. It records numerical residuals, analytic comparisons, refinement, and domain-sensitivity results.
 
 OpenAI Codex assisted with the IGRF-14 wrapper, geographic solver integration, tests, reference comparisons, and Jupyter demonstration. Geographic fields were checked against independently computed NOAA/CIRES geomaglib results and run with the shared solver in a Chromium Pyodide worker.
+
+OpenAI Codex assisted with the static dashboard, Web Worker adapter, build script, and Chromium smoke test. Browser results were compared against the native Python model, and both existing notebooks were rerun.
+
+OpenAI Codex assisted with the GitHub Pages workflow and its launch documentation. The staged site was tested under the repository URL prefix in Chromium.

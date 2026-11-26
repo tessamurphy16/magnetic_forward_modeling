@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f2f6f4">
+  <title>Magnetic Forward Modeling</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./styles.css">
+  <script defer src="./vendor/globe.gl.js"></script>
+  <script defer src="./vendor/plotly.js"></script>
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <header class="top-bar">
+    <div class="container top-inner">
+      <a class="identity" href="./"><span class="identity-mark" aria-hidden="true">⊕</span> Magnetic Modeling</a>
+      <button class="button secondary" id="reset" type="button">Reset defaults</button>
+    </div>
+  </header>
+  <main class="container">
+    <div class="intro">
+      <div class="kicker">Geophysics · Forward modeling</div>
+      <h1>Magnetic Forward Modeling</h1>
+      <p>Explore how a buried magnetic body changes the field measured along a survey.</p>
+    </div>
+    <div class="setup">
+      <section class="card location" aria-labelledby="location-title">
+        <div class="section-heading">
+          <div><h2 id="location-title">Geographic field</h2><p>IGRF-14 · Epoch 2026.0 · WGS84 height 0 km</p></div>
+        </div>
+        <div class="location-body">
+          <div class="globe-panel">
+            <div id="globe" aria-label="Earth globe. Drag to rotate, scroll to zoom, click to choose a location."></div>
+            <div class="globe-note" id="globe-note">Drag to rotate · Scroll to zoom · Click to select</div>
+          </div>
+          <div class="location-controls">
+            <label for="preset">Location preset</label>
+            <select id="preset"><option value="">Custom location</option></select>
+            <div class="coordinate-row">
+              <label>Latitude (°)<input id="latitude" type="number" min="-90" max="90" step="any" required></label>
+              <label>Longitude (°)<input id="longitude" type="number" min="-180" max="180" step="any" required></label>
+            </div>
+            <div class="intensity">
+              <span>Total main field</span>
+              <strong id="total-field">—</strong>
+            </div>
+            <dl class="field-grid">
+              <div><dt>Inclination</dt><dd id="inclination">—</dd></div>
+              <div><dt>Declination</dt><dd id="declination">—</dd></div>
+              <div><dt>North</dt><dd id="north">—</dd></div>
+              <div><dt>East</dt><dd id="east">—</dd></div>
+              <div><dt>Down</dt><dd id="down">—</dd></div>
+              <div><dt>Horizontal</dt><dd id="horizontal">—</dd></div>
+            </dl>
+          </div>
+        </div>
+      </section>
+      <section class="card orientation" aria-labelledby="orientation-title">
+        <div class="section-heading"><div><h2 id="orientation-title">Survey orientation</h2><p>Clockwise from geographic north</p></div></div>
+        <div class="azimuth-control" data-param="azimuth">
+          <label for="azimuth">Survey azimuth (°)</label>
+          <input id="azimuth-slider" aria-label="Survey azimuth slider" type="range" min="0" max="360" step="1">
+          <input id="azimuth" type="number" min="0" max="360" step="any" required>
+        </div>
+        <div class="compass-body">
+          <canvas id="compass" width="320" height="208" role="img" aria-label="Compass showing geographic north, magnetic north and survey direction"></canvas>
+          <dl class="compass-legend">
+            <div><dt><i class="key geographic"></i> Geographic north</dt></div>
+            <div><dt><i class="key magnetic"></i> Magnetic north</dt></div>
+            <div><dt><i class="key survey"></i> Survey direction</dt></div>
+            <div><dt>Relative heading</dt><dd id="relative-heading">—</dd></div>
+          </dl>
+        </div>
+        <dl class="field-grid rotated">
+          <div><dt>Survey x</dt><dd id="survey-x">—</dd></div>
+          <div><dt>Strike s</dt><dd id="strike-s">—</dd></div>
+          <div><dt>Down z</dt><dd id="down-z">—</dd></div>
+        </dl>
+        <p class="help">The body extends infinitely perpendicular to the survey. Azimuth changes its orientation relative to the field.</p>
+      </section>
+    </div>
+    <div class="workspace">
+      <section class="card parameters" aria-labelledby="parameters-title">
+        <div class="section-heading"><div><h2 id="parameters-title">Model parameters</h2><p>Rectangular ore body · 1,600 × 1,600 m domain</p></div></div>
+        <form id="model-form" novalidate>
+          <div id="parameters"></div>
+          <p class="help" id="grid-info"></p>
+          <button class="button primary" id="run" type="submit" disabled>Run simulation <span aria-hidden="true">→</span></button>
+          <div id="status" class="status" role="status" aria-live="polite">Loading Python runtime…</div>
+          <button class="button secondary" id="retry" type="button" hidden>Retry runtime</button>
+        </form>
+      </section>
+      <section class="card results" aria-labelledby="results-title" aria-busy="false">
+        <div class="section-heading results-heading">
+          <div><h2 id="results-title">Simulation results</h2><p id="result-summary">Run the model to plot the anomaly.</p></div>
+          <label class="heatmap-option" for="heatmap-type">Heatmap quantity
+            <select id="heatmap-type"><option value="vertical">Vertical anomaly ΔBz</option><option value="total">Exact total-field anomaly ΔF</option></select>
+          </label>
+        </div>
+        <div id="empty-result" class="empty-plot">
+          <div><strong>No simulation yet</strong><p>Run the model to see the cross-section and survey profile.</p></div>
+        </div>
+        <div id="plots" hidden>
+          <div id="heatmap" class="plot heatmap" role="region" aria-label="Magnetic anomaly cross-section"></div>
+          <div id="profile" class="plot profile" role="region" aria-label="Exact total-field anomaly profile"></div>
+          <details open>
+            <summary>Solver diagnostics and timings</summary>
+            <dl class="diagnostics" id="diagnostics"></dl>
+          </details>
+        </div>
+      </section>
+    </div>
+    <footer>Local main field and induced magnetization · NASA Blue Marble Earth imagery</footer>
+  </main>
+  <noscript>This application requires JavaScript to display the globe and run the Python model.</noscript>
+</body>
+</html>
