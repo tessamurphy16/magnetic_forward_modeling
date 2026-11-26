@@ -7,8 +7,8 @@ Use a vertical cross-section with horizontal coordinate `x` positive along the s
 Use the IGRF north, east, and down components `B_N,B_E,B_D`. Convert nT to T before computing the inducing field `H0 = B0 / μ0`. Rotate the vector into section coordinates:
 
 ```text
-Bx = BN cos`A` + BE sin`A`
-Bs = -BN sin`A` + BE cos`A`
+Bx = BN cos(A) + BE sin(A)
+Bs = -BN sin(A) + BE cos(A)
 Bz = BD
 F0 = sqrt(Bx² + Bs² + Bz²)
 ```
@@ -79,7 +79,7 @@ For a cylinder of radius (a) centered at the origin within a unit-permeability h
 2. Initialize a pinned Pyodide runtime once in the dedicated worker. Load its matched NumPy and SciPy builds and the built artifact from `magnetic_model/`. Bundle IGRF coefficients with the Python artifact or a versioned data asset and evaluate locally. Keep runtime loading, solver readiness, errors, and results explicit in the worker message protocol.
 3. Send input snapshots with request IDs. Coalesce rapid edits and ignore stale responses. Transfer typed-array buffers for plots and clean up Python proxies. Set grid limits after measuring solve time and peak memory on representative browsers. Keep globe interaction and rendering on the main thread while the solver runs.
 4. Use HTML/CSS/JS to render the heatmap and profile with physical units, axes, and captions. Test keyboard input, layout at narrow widths, worker initialization failure, and repeat runs. Check quantitative agreement for a fixed case through both native Python and the browser worker.
-5. Add a dependency manifest and reproducible environment for Python, NumPy, SciPy, pytest, and Jupyter execution. Pin the Pyodide release first and match native NumPy/SciPy versions to the compatible browser build where available. Record exact versions of the IGRF evaluator and coefficients, globe and plotting libraries or datasets, and CI actions. Verify the selected wheels and libraries in Pyodide before committing pins. This scaffold makes no dependency selections.
+5. Add a dependency manifest and reproducible environment for Python, NumPy, SciPy, pytest, and Jupyter execution. Pin the Pyodide release first and match native NumPy/SciPy versions to the compatible browser build where available. Record exact versions of the IGRF evaluator and coefficients, globe and plotting libraries or datasets, and CI actions. Verify the selected wheels and libraries in Pyodide before committing pins. The native solver and test versions are pinned in the requirements files. Confirm browser compatibility when selecting the Pyodide release.
 6. Add a GitHub Actions workflow to run native tests, execute the verification notebook, build the site into a staging directory, and run the browser smoke test against that artifact. Use relative URLs and test under a project subpath such as `/magnetic_forward_modeling/`. Serve the pinned runtime and application assets as part of the static site. Check browser loading of WASM and worker assets. Parallel WASM threads and cross-origin isolation are outside the baseline.
 7. Deploy the verified artifact from `main` with the official GitHub Pages Actions. Configure Pages to use GitHub Actions and grant the deployment job the required Pages and OIDC permissions. Verify worker initialization and a complete simulation at the published project URL.
 
