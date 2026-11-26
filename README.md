@@ -2,7 +2,7 @@
 
 A numerical PDE course project for exploring how buried magnetic bodies affect surface survey measurements. The planned browser app will use an interactive globe and IGRF to set the inducing field, then compute a 2D anomaly heatmap and a surface total-field anomaly profile in nT.
 
-The standalone NumPy/SciPy solver accepts local IGRF field elements supplied by the caller. Geographic IGRF evaluation, the browser interface, the executed verification notebook, and the Pages workflow are future milestones.
+The standalone NumPy/SciPy solver accepts local IGRF field elements supplied by the caller. Geographic IGRF evaluation, the browser interface and the Pages workflow are future milestones.
 
 ## Run the solver and tests
 
@@ -15,7 +15,7 @@ python -m pip install -r requirements-dev.txt
 python -m pytest -q
 ```
 
-`requirements.txt` pins the solver dependencies. From the same directory, run a model with:
+`requirements.txt` pins the solver and notebook dependencies. From the same directory, run a model with:
 
 ```python
 from magnetic_model import Grid, OreBody, simulate
@@ -38,12 +38,24 @@ The example field elements are illustrative. Enter intensity in nT and angles in
 
 Potential is in A. Scalar arrays are indexed by depth then distance, and magnetic induction vectors end in survey, strike, and down components. The result also provides cell and face coordinates in m, face-normal anomalies in nT, represented ore-body bounds, and linear and flux-balance residuals. Ore-body geometry is assigned by cell centers, so the represented bounds can differ from the requested dimensions.
 
-## Numerical checks
+## Run the verification notebook
 
-For the rectangular case above, sampling 21 profile points from −100 to 100 m on a fixed 640 m × 640 m domain gave RMS differences of 1.76 nT and 0.36 nT for 10 m and 5 m spacing, respectively, relative to a 2.5 m grid. At 5 m spacing, doubling the domain dimensions changed that profile by 14.50 nT RMS. Enlarge the domain at fixed spacing until boundary effects are small enough for the survey, then check grid refinement separately.
+The [executed notebook](notebooks/verification.ipynb) includes the derivation, plots, error tables, and the domain sensitivity study. It imports the shared solver directly from the checkout.
 
-A 2 m grid reproduced the analytic exterior potential of a 20 m radius cylinder to 6.56% relative L2 error over the annulus from 30 to 60 m in a 320 m × 320 m domain. This comparison includes the effects of the finite zero-potential boundary and the stair-stepped cylinder.
+With the Python 3.12 virtual environment active, run from the repository root:
 
+```sh
+python -m pip install -r requirements.txt
+python -m notebook notebooks/verification.ipynb
+```
+
+In Jupyter, select the Python 3 kernel for this environment and use **Kernel → Restart Kernel and Run All Cells**. To execute and save every output from the terminal:
+
+```sh
+python -m nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=180 notebooks/verification.ipynb
+```
+
+The largest sensitivity case solves for 262,144 cells. For the rectangular example, the notebook reproduces the 0.36 nT RMS grid-refinement difference and the 14.50 nT RMS domain-doubling difference. Domain size and grid resolution should be checked separately for new geometries.
 
 ## Repository layout
 

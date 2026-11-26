@@ -124,3 +124,21 @@ def test_invalid_geometry_and_height():
         run(OreBody(1, 1, 1, 0.25))
     with pytest.raises(ValueError, match="positive"):
         OreBody(60, 30, 20, -1)
+
+
+def test_nonzero_dirichlet_values_reproduce_affine_potential():
+    spacing = 2.0
+    x = spacing * (np.arange(8) + 0.5)
+    z = spacing * (np.arange(5) + 0.5)
+
+    def affine(x_m, z_m):
+        return 3 + 2 * x_m - 4 * z_m
+
+    boundary = (affine(0, z), affine(16, z), affine(x, 0), affine(x, 10))
+    potential, flux_x, flux_z, _, relative = solve_potential(
+        np.ones((z.size, x.size)), spacing, (0, 0), boundary_a=boundary,
+    )
+    np.testing.assert_allclose(potential, affine(x[None, :], z[:, None]), atol=1e-12)
+    np.testing.assert_allclose(flux_x, -2, atol=1e-12)
+    np.testing.assert_allclose(flux_z, 4, atol=1e-12)
+    assert relative < 1e-12
